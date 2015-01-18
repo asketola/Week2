@@ -8,7 +8,7 @@
 
 import UIKit
 
-class GalleryCell: UICollectionViewCell {
+class GalleryCell: UICollectionViewCell {                  // This defines the proprties of the 'cell'/image - how you will see each image in the Photo Gallery
   
   let imageView = UIImageView()
   
@@ -17,13 +17,22 @@ class GalleryCell: UICollectionViewCell {
     self.addSubview(self.imageView)
     self.backgroundColor = UIColor.whiteColor()
     imageView.frame = self.bounds
-    imageView.contentMode = UIViewContentMode.ScaleAspectFit
+    
+    // Required code for imageView
+    imageView.contentMode = UIViewContentMode.ScaleAspectFill
+    imageView.setTranslatesAutoresizingMaskIntoConstraints(false)
     imageView.layer.masksToBounds = true
     
+    let views = ["imageView" : imageView]
+    
+    // Constraints for the image in the imageView
+    let imageViewConstraintsHorizontal = NSLayoutConstraint.constraintsWithVisualFormat("H:|[imageView]|", options: nil, metrics: nil, views: views)
+    self.addConstraints(imageViewConstraintsHorizontal)
+    let imageViewConstraintsVertical = NSLayoutConstraint.constraintsWithVisualFormat("V:|[imageView]|", options: nil, metrics: nil, views: views)
+    self.addConstraints(imageViewConstraintsVertical)
   }
-  
+  // Required code
   required init(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
   }
-    
 }

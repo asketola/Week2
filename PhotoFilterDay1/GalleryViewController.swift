@@ -35,7 +35,7 @@ class GalleryViewController: UIViewController, UICollectionViewDataSource, UICol
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    self.view.backgroundColor = UIColor.whiteColor()
+    self.view.backgroundColor = UIColor.blackColor()
     self.collectionView.registerClass(GalleryCell.self, forCellWithReuseIdentifier: "GALLERY_CELL")
     let image1 = UIImage(named: "IMG_3877.JPG")
     let image2 = UIImage(named: "IMG_3142.JPG")
@@ -52,7 +52,7 @@ class GalleryViewController: UIViewController, UICollectionViewDataSource, UICol
     
     
     // Pinch gesture initiizers
-    let pinchRecognizer = UIPinchGestureRecognizer(target: self, action: "collectionViewPinched")
+    let pinchRecognizer = UIPinchGestureRecognizer(target: self, action: "collectionViewPinched:")
     self.collectionView.addGestureRecognizer(pinchRecognizer)
   }
   
@@ -62,21 +62,36 @@ class GalleryViewController: UIViewController, UICollectionViewDataSource, UICol
     case .Began:
       println("began pinching")
     case .Changed:
-      println("changed pinching")
+      println("changed pinching \(sender.velocity)")
     case .Ended:
       println("ended pinch")
+      self.collectionView.performBatchUpdates({ () -> Void in
+        if sender.velocity > 0 {
+          // makes it bigger
+          let newSize = CGSize(width: self.collectionViewFlowLayout.itemSize.width * 2, height: self.collectionViewFlowLayout.itemSize.height * 2)
+          self.collectionViewFlowLayout.itemSize = newSize
+        } else if sender.velocity < 0 {
+          // makes it smaller
+          let newSize = CGSize(width: self.collectionViewFlowLayout.itemSize.width / 2, height: self.collectionViewFlowLayout.itemSize.height / 2)
+          self.collectionViewFlowLayout.itemSize = newSize
+        }
+      }, completion: { (finished) -> Void in
+        
+      })
+      
     default:
-      println("defualt")
+      println("default")
     }
     println("collection view pinched")
     
   }
   
-  // UICollectionViewDataSource both functions required
+  // UICollectionViewDataSource both functions required - Tells you how many items are in the cell
   func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     return self.images.count
+    //return 1000   // <- to show that pinch works
   }
-  
+  // Tells you how to draw the cell
   func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
     let cell = collectionView.dequeueReusableCellWithReuseIdentifier("GALLERY_CELL", forIndexPath: indexPath) as GalleryCell
     let image = self.images[indexPath.row]
@@ -84,11 +99,10 @@ class GalleryViewController: UIViewController, UICollectionViewDataSource, UICol
     return cell
   }
 
-  // For UICollectionViewDelegate
-  
+  // For UICollectionViewDelegate - tells you which one in the array of images you selected
   func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
     self.delegate?.controllerDidSelectImage(self.images[indexPath.row])  // uses the protocol to pass the image and row its at over to the View Controller
-    
+    println("image passed from GalleryViewController")
     
     self.navigationController?.popViewControllerAnimated(true)
   }
